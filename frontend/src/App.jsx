@@ -27,6 +27,7 @@ import Summarizer from "./pages/Summarizer/Summarizer";
 import Quiz from "./pages/Quiz/Quiz";
 import Profile from "./pages/Profile/Profile";
 import Leaderboard from "./pages/Leaderboard/Leaderboard";
+import ResourceLibrary from "./pages/ResourceLibrary/ResourceLibrary";
 
 import "./index.css";
 
@@ -36,45 +37,27 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <SocketProvider>
-            <Router>
+            <Router future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
               <div className="min-h-screen w-full transition-colors relative overflow-x-hidden">
                 <Routes>
                   <Route
                     path="/"
-                    element={
-                      <>
-                        <Navbar />
-                        <Landing />
-                      </>
-                    }
+                    element={<Navigate to="/dashboard" replace />}
                   />
                   <Route
                     path="/login"
-                    element={
-                      <>
-                        <Navbar />
-                        <Login />
-                      </>
-                    }
+                    element={<Login />}
                   />
                   <Route
                     path="/signup"
-                    element={
-                      <>
-                        <Navbar />
-                        <Signup />
-                      </>
-                    }
+                    element={<Signup />}
                   />
                   <Route
                     path="/forgot-password"
-                    element={
-                      <>
-                        <Navbar />
-                        <ForgotPassword />
-                      </>
-                    }
+                    element={<ForgotPassword />}
                   />
+
+                  {/* Authenticated routes with Layout (Sidebar + Navbar) */}
                   <Route
                     path="/dashboard"
                     element={
@@ -85,6 +68,70 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
+                  <Route
+                    path="/tables"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          {/* Placeholder for Tables Page Content */}
+                          <div className="text-white">Tables Page Content</div>
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/billing"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          {/* Placeholder for Billing Page Content */}
+                          <div className="text-white">Billing Page Content</div>
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/rtl"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          {/* Placeholder for RTL Page Content */}
+                          <div className="text-white">RTL Page Content</div>
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Profile />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/sign-in"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Login /> {/* Re-using Login component for sign-in for now */}
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/sign-up"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <Signup /> {/* Re-using Signup component for sign-up for now */}
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  {/* Existing protected routes */}
                   <Route
                     path="/buy-sell"
                     element={
@@ -136,16 +183,6 @@ function App() {
                     }
                   />
                   <Route
-                    path="/profile"
-                    element={
-                      <ProtectedRoute>
-                        <Layout>
-                          <Profile />
-                        </Layout>
-                      </ProtectedRoute>
-                    }
-                  />
-                  <Route
                     path="/leaderboard"
                     element={
                       <ProtectedRoute>
@@ -156,13 +193,20 @@ function App() {
                     }
                   />
                   <Route
-                    path="/404"
+                    path="/resources"
                     element={
-                      <>
-                        <Navbar />
-                        <Error404 />
-                      </>
+                      <ProtectedRoute>
+                        <Layout>
+                          <ResourceLibrary />
+                        </Layout>
+                      </ProtectedRoute>
                     }
+                  />
+
+                  {/* 404 Route */}
+                  <Route
+                    path="/404"
+                    element={<Error404 />}
                   />
                   <Route path="*" element={<Navigate to="/404" replace />} />
                 </Routes>
