@@ -28,6 +28,7 @@ import Quiz from "./pages/Quiz/Quiz";
 import Profile from "./pages/Profile/Profile";
 import Leaderboard from "./pages/Leaderboard/Leaderboard";
 import ResourceLibrary from "./pages/ResourceLibrary/ResourceLibrary";
+import ConnectToSeniors from "./pages/ConnectToSeniors/ConnectToSeniors";
 
 import "./index.css";
 
@@ -198,6 +199,16 @@ function App() {
                       <ProtectedRoute>
                         <Layout>
                           <ResourceLibrary />
+                        </Layout>
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/connect-to-seniors"
+                    element={
+                      <ProtectedRoute>
+                        <Layout>
+                          <ConnectToSeniors />
                         </Layout>
                       </ProtectedRoute>
                     }

@@ -56,24 +56,8 @@ export default function Navbar() {
       <div className="flex items-center justify-between">
         {/* Left side: Breadcrumbs */}
         <div className="flex flex-col">
-          {location.pathname !== "/dashboard" && (
-            <div className="text-sm text-dark-blue-text-light">
-              {breadcrumbs.map((crumb, index) => (
-                <span key={crumb.path}>
-                  <Link to={crumb.path} className="hover:text-white">
-                    {crumb.name}
-                  </Link>
-                  {index < breadcrumbs.length - 1 && " / "}
-                </span>
-              ))}
-            </div>
-          )}
           <h2 className="text-white text-xl font-bold capitalize">
-            {location.pathname === "/dashboard"
-              ? "MindVerse"
-              : breadcrumbs.length > 0
-              ? breadcrumbs[breadcrumbs.length - 1].name
-              : "MindVerse"}
+            {"MindVerse"}
           </h2>
         </div>
 

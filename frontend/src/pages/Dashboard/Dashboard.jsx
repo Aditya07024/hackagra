@@ -18,6 +18,7 @@ import {
   FiUpload, // For upload files card
   FiList, // For to-do list card
   FiX, // For delete button in to-do list
+  FiUsers, // Added for Connect to Seniors card
 } from "react-icons/fi";
 import {
   ResponsiveContainer,
@@ -444,6 +445,26 @@ export default function Dashboard() {
             >
               Browse Resources
             </button>
+          </div>
+        </div>
+
+        {/* Connect to Seniors Card */}
+        <div
+          onClick={() => navigate("/connect-to-seniors")}
+          className="bg-dark-blue-card p-6 rounded-2xl shadow-lg cursor-pointer hover:bg-dark-blue-light transition-colors duration-200"
+        >
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-bold text-white">🧑‍🏫 Connect to Seniors</h2>
+            
+          </div>
+          <div className="text-center py-12">
+            <FiUsers className="w-16 h-16 text-dark-blue-text-light mx-auto mb-4" />
+            <p className="text-dark-blue-text-light mb-4">
+              Get guidance from experienced seniors in your field.
+              <br />
+              Connect and learn!
+            </p>
+            
           </div>
         </div>
       </div>
