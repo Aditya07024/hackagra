@@ -20,6 +20,7 @@ export const ThemeProvider = ({ children }) => {
         : "light")
     );
   });
+  // const [showDashboardNotifications, setShowDashboardNotifications] = useState(false); // Removed
 
   useEffect(() => {
     const root = window.document.documentElement;
@@ -35,8 +36,12 @@ export const ThemeProvider = ({ children }) => {
     setTheme((prev) => (prev === "dark" ? "light" : "dark"));
   };
 
+  // const toggleDashboardNotifications = () => { // Removed
+  //   setShowDashboardNotifications((prev) => !prev);
+  // };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme }}> {/* Removed showDashboardNotifications, toggleDashboardNotifications */}
       {children}
     </ThemeContext.Provider>
   );
