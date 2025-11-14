@@ -55,18 +55,18 @@ export default function Notifications() {
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
-    <div className="bg-gradient-to-br from-slate-800 to-slate-700 rounded-2xl shadow-lg p-4 sm:p-6 border border-blue-500/30">
+    <div className="bg-white rounded-2xl shadow-lg p-4 sm:p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h3 className="text-sm text-white mb-1 font-semibold">
+          <h3 className="text-sm opacity-90 mb-1 font-semibold">
             Notifications
           </h3>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs opacity-75">
             You have {unreadCount} unread notifications
           </p>
         </div>
         {unreadCount > 0 && (
-          <span className="px-3 py-1 bg-red-500 text-white rounded-full text-xs font-semibold">
+          <span className="px-3 py-1 bg-dashboard-red text-white rounded-full text-xs font-semibold">
             {unreadCount}
           </span>
         )}
@@ -77,8 +77,8 @@ export default function Notifications() {
             key={notification.id}
             className={`p-4 rounded-lg border ${
               notification.read
-                ? "bg-slate-700/50 border-slate-600/50"
-                : "bg-blue-500/20 border-blue-500/50"
+                ? "bg-gray-50 border-gray-200"
+                : "bg-blue-50 border-blue-200"
             }`}
           >
             <div className="flex items-start justify-between">
@@ -86,13 +86,13 @@ export default function Notifications() {
                 <p
                   className={`text-sm ${
                     notification.read
-                      ? "text-gray-400"
-                      : "text-white font-semibold"
+                      ? "text-gray-600"
+                      : "text-gray-900 font-semibold"
                   }`}
                 >
                   {notification.message}
                 </p>
-                <p className="text-xs text-gray-400 mt-1">
+                <p className="text-xs text-gray-500 mt-1">
                   {notification.time}
                 </p>
               </div>
@@ -100,26 +100,26 @@ export default function Notifications() {
                 {!notification.read && (
                   <button
                     onClick={() => markAsRead(notification.id)}
-                    className="p-1 hover:bg-blue-500/30 rounded transition"
+                    className="p-1 hover:bg-blue-100 rounded transition"
                     title="Mark as read"
                   >
-                    <FiCheck className="w-4 h-4 text-blue-400" />
+                    <FiCheck className="w-4 h-4 text-blue-600" />
                   </button>
                 )}
                 <button
                   onClick={() => deleteNotification(notification.id)}
-                  className="p-1 hover:bg-gray-600 rounded transition"
+                  className="p-1 hover:bg-gray-200 rounded transition"
                   title="Delete"
                 >
-                  <FiX className="w-4 h-4 text-gray-400" />
+                  <FiX className="w-4 h-4 text-gray-500" />
                 </button>
               </div>
             </div>
           </div>
         ))}
         {notifications.length === 0 && (
-          <div className="text-center py-8 text-gray-400">
-            <FiBell className="w-12 h-12 mx-auto mb-2 opacity-50 text-gray-400" />
+          <div className="text-center py-8 text-gray-500">
+            <FiBell className="w-12 h-12 mx-auto mb-2 opacity-50" />
             <p>No notifications</p>
           </div>
         )}

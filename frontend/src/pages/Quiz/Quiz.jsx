@@ -100,21 +100,21 @@ export default function Quiz() {
 
   if (score) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
+      <div className="min-h-screen bg-dark-blue-bg py-8 px-4">
         <div className="max-w-2xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center">
+          <div className="bg-dark-blue-card rounded-lg shadow-md p-8 text-center">
             <FiAward className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
-            <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">Quiz Complete!</h2>
+            <h2 className="text-3xl font-bold text-white mb-4">Quiz Complete!</h2>
             <div className="space-y-4 mb-6">
               <div>
-                <p className="text-gray-600 dark:text-gray-400">Your Score</p>
-                <p className="text-4xl font-bold text-blue-600 dark:text-blue-400">
+                <p className="text-dark-blue-text-light">Your Score</p>
+                <p className="text-4xl font-bold text-accent-blue">
                   {score.score}/{score.total}
                 </p>
               </div>
               <div>
-                <p className="text-gray-600 dark:text-gray-400">Accuracy</p>
-                <p className="text-2xl font-semibold text-green-600 dark:text-green-400">
+                <p className="text-dark-blue-text-light">Accuracy</p>
+                <p className="text-2xl font-semibold text-green-500">
                   {score.accuracy}%
                 </p>
               </div>
@@ -125,13 +125,13 @@ export default function Quiz() {
                   setScore(null);
                   setCurrentQuiz(null);
                 }}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-6 py-2 bg-accent-blue text-white rounded-lg hover:bg-accent-blue-light transition"
               >
                 Take Another Quiz
               </button>
               <Link
                 to="/leaderboard"
-                className="px-6 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                className="px-6 py-2 bg-dark-blue-light text-white rounded-lg hover:bg-dark-blue-text-light transition"
               >
                 View Leaderboard
               </Link>
@@ -147,29 +147,29 @@ export default function Quiz() {
     const progress = ((currentQuestion + 1) / currentQuiz.questions.length) * 100;
 
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4">
+      <div className="min-h-screen bg-dark-blue-bg py-8 px-4">
         <div className="max-w-3xl mx-auto">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
+          <div className="bg-dark-blue-card rounded-lg shadow-md p-6 mb-6">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-gray-900 dark:text-white">{currentQuiz.title}</h2>
-              <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+              <h2 className="text-xl font-bold text-white">{currentQuiz.title}</h2>
+              <div className="flex items-center gap-2 text-red-500">
                 <FiClock />
                 {formatTime(timeLeft)}
               </div>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div className="w-full bg-dark-blue-light rounded-full h-2">
               <div
-                className="bg-blue-600 h-2 rounded-full transition-all"
+                className="bg-accent-blue h-2 rounded-full transition-all"
                 style={{ width: `${progress}%` }}
               ></div>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+            <p className="text-sm text-dark-blue-text-light mt-2">
               Question {currentQuestion + 1} of {currentQuiz.questions.length}
             </p>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-6">
+          <div className="bg-dark-blue-card rounded-lg shadow-md p-6">
+            <h3 className="text-xl font-semibold text-white mb-6">
               {question.question}
             </h3>
             <div className="space-y-3">
@@ -179,17 +179,17 @@ export default function Quiz() {
                   onClick={() => handleAnswerSelect(idx)}
                   className={`w-full text-left p-4 rounded-lg border-2 transition ${
                     selectedAnswer === idx
-                      ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                      : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                      ? 'border-accent-blue bg-accent-blue/20'
+                      : 'border-dark-blue-light hover:border-accent-blue/50'
                   }`}
                 >
-                  <span className="font-semibold text-gray-900 dark:text-white">{option}</span>
+                  <span className="font-semibold text-white">{option}</span>
                 </button>
               ))}
             </div>
             <button
               onClick={handleNext}
-              className="mt-6 w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition font-semibold"
+              className="mt-6 w-full px-6 py-3 bg-accent-blue text-white rounded-lg hover:bg-accent-blue-light transition font-semibold"
             >
               {currentQuestion < currentQuiz.questions.length - 1 ? 'Next' : 'Submit Quiz'}
             </button>
@@ -203,10 +203,10 @@ export default function Quiz() {
     <div className="min-h-screen w-full">
       <div className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 py-4 sm:py-5 lg:py-6">
         <div className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-white">Quiz</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">Quiz</h1>
           <Link
             to="/leaderboard"
-            className="flex items-center gap-2 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition"
+            className="flex items-center gap-2 px-4 py-2 bg-dark-blue-light text-white rounded-lg hover:bg-dark-blue-text-light transition"
           >
             <FiAward /> Leaderboard
           </Link>
@@ -214,10 +214,10 @@ export default function Quiz() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {quizzes.map((quiz) => (
-            <div key={quiz._id} className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 sm:p-6">
-              <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">{quiz.title}</h3>
-              <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">{quiz.description}</p>
-              <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mb-4">
+            <div key={quiz._id} className="bg-dark-blue-card rounded-lg shadow-md p-4 sm:p-6">
+              <h3 className="text-xl font-bold text-white mb-2">{quiz.title}</h3>
+              <p className="text-dark-blue-text-light text-sm mb-4">{quiz.description}</p>
+              <div className="flex items-center gap-4 text-sm text-dark-blue-text-light mb-4">
                 <span className="flex items-center gap-1">
                   <FiClock /> {quiz.duration} min
                 </span>
@@ -226,7 +226,7 @@ export default function Quiz() {
               <button
                 onClick={() => startQuiz(quiz._id)}
                 disabled={quizLoading}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-accent-blue text-white rounded-lg hover:bg-accent-blue-light transition disabled:opacity-50"
               >
                 <FiPlay /> Start Quiz
               </button>
@@ -234,7 +234,7 @@ export default function Quiz() {
           ))}
           {quizzes.length === 0 && (
             <div className="col-span-full text-center py-12">
-              <p className="text-gray-500 dark:text-gray-400">No quizzes available yet</p>
+              <p className="text-dark-blue-text-light">No quizzes available yet</p>
             </div>
           )}
         </div>
