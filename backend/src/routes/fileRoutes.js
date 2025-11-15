@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const fileController = require("../controllers/fileController");
+const ocrController = require("../controllers/ocrController");
 const axios = require("axios");
 
 // Memory storage for multer (files won't be saved to disk)
@@ -84,13 +85,11 @@ router.get("/files/proxy-pdf", async (req, res) => {
     return res.status(200).send(Buffer.from(upstream.data));
   } catch (err) {
     console.error("Proxy PDF error:", err?.message || err);
-    return res
-      .status(500)
-      .json({
-        success: false,
-        message: "Proxy error",
-        error: err?.message || err,
-      });
+    return res.status(500).json({
+      success: false,
+      message: "Proxy error",
+      error: err?.message || err,
+    });
   }
 });
 
@@ -127,5 +126,12 @@ router.delete(
   "/files/user/:userId/files/:fileId",
   fileController.deleteUserFile
 );
+
+/**
+ * @route POST /api/files/ocr
+ * @desc Extract text from image or PDF using OCR
+ * @body { fileUrl, fileType, filename }
+ */
+router.post("/files/ocr", ocrController.extractTextFromFile);
 
 module.exports = router;

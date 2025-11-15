@@ -5,6 +5,7 @@ import {
   saveFileUrlToDatabase,
   getUserFiles,
 } from "../../utils/cloudinaryUpload";
+import { extractTextViaOCR } from "../../utils/ocrUpload";
 import toast from "react-hot-toast";
 import Loading from "../../components/Loading/Loading";
 import {
@@ -13,6 +14,7 @@ import {
   FiTrash2,
   FiFileText,
   FiExternalLink,
+  FiZap,
 } from "react-icons/fi";
 import PDFViewer from "../../components/PDFViewer.jsx";
 
@@ -26,6 +28,8 @@ export default function Summarizer() {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [userId, setUserId] = useState(null);
+  const [ocrResult, setOcrResult] = useState(null);
+  const [ocrLoading, setOcrLoading] = useState(false);
 
   // Load user ID
   useEffect(() => {
@@ -98,6 +102,40 @@ export default function Summarizer() {
     toast.success("Copied!");
   };
 
+  const handleOCR = async () => {
+    if (!selectedFile) {
+      toast.error("Please select a file first");
+      return;
+    }
+
+    // Only support images and PDFs
+    if (
+      !selectedFile.fileType?.startsWith("image/") &&
+      selectedFile.fileType !== "application/pdf"
+    ) {
+      toast.error("Only images and PDFs are supported for OCR");
+      return;
+    }
+
+    setOcrLoading(true);
+    try {
+      console.log(`🔍 Starting OCR for: ${selectedFile.filename}`);
+      const result = await extractTextViaOCR(
+        selectedFile.fileUrl,
+        selectedFile.fileType,
+        selectedFile.filename
+      );
+
+      setOcrResult(result);
+      toast.success("OCR completed!");
+    } catch (error) {
+      console.error("❌ OCR error:", error);
+      toast.error(`OCR failed: ${error.message}`);
+    } finally {
+      setOcrLoading(false);
+    }
+  };
+
   const handleDelete = async (fileId) => {
     if (!confirm("Delete this file?")) return;
 
@@ -107,7 +145,10 @@ export default function Summarizer() {
       if (res.data.success) {
         toast.success("Deleted");
         await fetchUserFiles();
-        if (selectedFile?.id === fileId) setSelectedFile(null);
+        if (selectedFile?.id === fileId) {
+          setSelectedFile(null);
+          setOcrResult(null);
+        }
       }
     } catch {
       toast.error("Error deleting file");
@@ -141,10 +182,8 @@ export default function Summarizer() {
         </h1>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-
           {/* ================= LEFT PANEL ================= */}
           <div className="lg:col-span-1 space-y-6">
-
             {/* Upload Box */}
             <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md">
               <h2 className="text-xl font-bold mb-4">Upload File</h2>
@@ -196,7 +235,9 @@ export default function Summarizer() {
                           : "bg-gray-50 hover:border-blue-500"
                       }`}
                     >
-                      <h4 className="font-semibold truncate">{file.filename}</h4>
+                      <h4 className="font-semibold truncate">
+                        {file.filename}
+                      </h4>
                       <p className="text-xs">
                         {formatDate(file.uploadedAt)} •{" "}
                         {formatFileSize(file.fileSize)}
@@ -208,16 +249,13 @@ export default function Summarizer() {
                 <p className="text-center py-8">No files yet.</p>
               )}
             </div>
-
           </div>
 
           {/* ================= RIGHT PANEL ================= */}
           <div className="lg:col-span-2 space-y-6">
-
             {/* File Details / Preview */}
             {selectedFile ? (
               <div className="bg-white dark:bg-gray-800 p-6 rounded shadow-md">
-
                 <div className="flex justify-between items-start">
                   <div>
                     <h2 className="text-2xl font-bold">
@@ -232,21 +270,40 @@ export default function Summarizer() {
                   </div>
 
                   <div className="flex gap-2">
-                    <button onClick={handleCopy} className="p-2 bg-gray-200 rounded">
+                    <button
+                      onClick={handleCopy}
+                      className="p-2 bg-gray-200 rounded hover:bg-gray-300 transition"
+                      title="Copy URL"
+                    >
                       <FiCopy />
+                    </button>
+
+                    <button
+                      onClick={handleOCR}
+                      disabled={
+                        ocrLoading ||
+                        (selectedFile.fileType !== "application/pdf" &&
+                          !selectedFile.fileType?.startsWith("image/"))
+                      }
+                      className="p-2 bg-purple-200 text-purple-600 rounded hover:bg-purple-300 disabled:bg-gray-300 transition"
+                      title="Extract text using OCR"
+                    >
+                      <FiZap />
                     </button>
 
                     <a
                       href={selectedFile.fileUrl}
                       target="_blank"
-                      className="p-2 bg-gray-200 rounded"
+                      className="p-2 bg-gray-200 rounded hover:bg-gray-300 transition"
+                      title="Open in new tab"
                     >
                       <FiExternalLink />
                     </a>
 
                     <button
                       onClick={() => handleDelete(selectedFile.id)}
-                      className="p-2 bg-red-200 text-red-600 rounded"
+                      className="p-2 bg-red-200 text-red-600 rounded hover:bg-red-300 transition"
+                      title="Delete file"
                     >
                       <FiTrash2 />
                     </button>
@@ -290,6 +347,38 @@ export default function Summarizer() {
                       </div>
                     )}
                 </div>
+
+                {/* OCR Results */}
+                {ocrResult && (
+                  <div className="bg-blue-50 dark:bg-blue-900 p-6 rounded shadow-md mt-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-lg font-bold text-blue-900 dark:text-blue-100 flex items-center gap-2">
+                        <FiZap className="text-purple-600" />
+                        OCR Results
+                      </h3>
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            ocrResult.extractedText
+                          );
+                          toast.success("Text copied to clipboard!");
+                        }}
+                        className="text-sm bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 transition"
+                      >
+                        Copy Text
+                      </button>
+                    </div>
+
+                    <p className="text-xs text-gray-600 dark:text-gray-400 mb-4">
+                      Extracted at:{" "}
+                      {new Date(ocrResult.timestamp).toLocaleString()}
+                    </p>
+
+                    <div className="bg-white dark:bg-gray-800 p-4 rounded max-h-96 overflow-y-auto whitespace-pre-wrap text-sm text-gray-800 dark:text-gray-200 font-mono">
+                      {ocrResult.extractedText || "No text extracted"}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <div className="bg-white dark:bg-gray-800 p-12 rounded shadow text-center">
@@ -298,7 +387,6 @@ export default function Summarizer() {
               </div>
             )}
           </div>
-
         </div>
       </div>
     </div>
