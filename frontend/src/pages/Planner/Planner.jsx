@@ -10,11 +10,13 @@ export default function Planner() {
   const [showModal, setShowModal] = useState(false);
   const [editingPlan, setEditingPlan] = useState(null);
   const [formData, setFormData] = useState({
-    subjects: '',
+    subjects: [], // Changed to array
     hoursPerDay: '',
     examDate: '',
     name: '',
   });
+  const [generatedSchedule, setGeneratedSchedule] = useState([]); // New state for generated schedule
+  const [generatingAiPlan, setGeneratingAiPlan] = useState(false); // New state for AI plan generation loading
 
   useEffect(() => {
     fetchPlans();
@@ -34,16 +36,23 @@ export default function Planner() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const planData = {
+        ...formData,
+        subjects: formData.subjects.map(s => s.trim()).filter(s => s.length > 0), // Ensure subjects are trimmed and not empty
+        schedule: generatedSchedule, // Include the generated schedule
+      };
+
       if (editingPlan) {
-        await api.put(`/planner/${editingPlan._id}`, formData);
+        await api.put(`/planner/${editingPlan._id}`, planData);
         toast.success('Plan updated successfully');
       } else {
-        await api.post('/planner', formData);
+        await api.post('/planner', planData);
         toast.success('Plan created successfully');
       }
       setShowModal(false);
       setEditingPlan(null);
-      setFormData({ subjects: '', hoursPerDay: '', examDate: '', name: '' });
+      setFormData({ subjects: [], hoursPerDay: '', examDate: '', name: '' });
+      setGeneratedSchedule([]); // Clear generated schedule after saving
       fetchPlans();
     } catch (error) {
       toast.error(error.response?.data?.message || 'Failed to save plan');
@@ -64,12 +73,76 @@ export default function Planner() {
   const handleEdit = (plan) => {
     setEditingPlan(plan);
     setFormData({
-      subjects: plan.subjects.join(', '),
+      subjects: plan.subjects || [], // Ensure it's an array
       hoursPerDay: plan.hoursPerDay,
       examDate: plan.examDate.split('T')[0],
       name: plan.name || '',
     });
+    setGeneratedSchedule(plan.schedule || []); // Load existing schedule
     setShowModal(true);
+  };
+
+  const generateTimetable = async () => { // Made async
+    const { subjects, hoursPerDay, examDate } = formData;
+
+    if (subjects.length === 0 || !hoursPerDay || !examDate) {
+      toast.error("Please enter subjects, hours per day, and exam date to generate a timetable.");
+      return;
+    }
+
+    setGeneratingAiPlan(true); // Start loading
+
+    try {
+      // Simulate an AI API call
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate 2-second API call
+
+      const subjectsArray = subjects;
+      const hours = parseInt(hoursPerDay);
+      const exam = new Date(examDate);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0); // Normalize today's date
+
+      const totalDays = Math.ceil((exam - today) / (1000 * 60 * 60 * 24));
+      if (totalDays <= 0) {
+        toast.error("Exam date must be in the future.");
+        setGeneratingAiPlan(false);
+        return;
+      }
+
+      const aiGeneratedSchedule = [];
+      let subjectIndex = 0;
+
+      for (let i = 0; i < totalDays; i++) {
+        const currentDate = new Date(today);
+        currentDate.setDate(today.getDate() + i);
+
+        const dailySubjects = [];
+        let hoursLeftForDay = hours;
+
+        // A simple AI-like logic: prioritize subjects based on a round-robin,
+        // could be extended with difficulty, user performance, etc.
+        while (hoursLeftForDay > 0 && dailySubjects.length < subjectsArray.length) {
+          const subjectToStudy = subjectsArray[subjectIndex % subjectsArray.length];
+          dailySubjects.push(subjectToStudy);
+          subjectIndex++;
+          hoursLeftForDay--; // Simple allocation: 1 hour per subject per day
+        }
+
+        aiGeneratedSchedule.push({
+          date: currentDate.toLocaleDateString(),
+          subjects: dailySubjects,
+          hours: hours - hoursLeftForDay, // Actual hours allocated for the day
+        });
+      }
+
+      setGeneratedSchedule(aiGeneratedSchedule);
+      toast.success("AI-generated timetable!");
+    } catch (error) {
+      console.error("Error generating AI timetable:", error);
+      toast.error("Failed to generate AI timetable.");
+    } finally {
+      setGeneratingAiPlan(false); // End loading
+    }
   };
 
   if (loading) return <Loading />;
@@ -82,7 +155,8 @@ export default function Planner() {
           <button
             onClick={() => {
               setEditingPlan(null);
-              setFormData({ subjects: '', hoursPerDay: '', examDate: '', name: '' });
+              setFormData({ subjects: [], hoursPerDay: '', examDate: '', name: '' });
+              setGeneratedSchedule([]); // Clear generated schedule when creating new plan
               setShowModal(true);
             }}
             className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
@@ -121,7 +195,7 @@ export default function Planner() {
                   <div className="max-h-32 overflow-y-auto space-y-1">
                     {plan.schedule.slice(0, 3).map((day, idx) => (
                       <div key={idx} className="text-xs text-gray-600 dark:text-gray-400">
-                        {day.date}: {day.subjects.join(', ')}
+                        {day.date}: {day.subjects.join(', ')} ({day.hours} hrs)
                       </div>
                     ))}
                     {plan.schedule.length > 3 && (
@@ -163,14 +237,18 @@ export default function Planner() {
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
-                <input
-                  type="text"
-                  placeholder="Subjects (comma-separated)"
-                  value={formData.subjects}
-                  onChange={(e) => setFormData({ ...formData, subjects: e.target.value })}
-                  required
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
+                <div className="space-y-2">
+                  <label htmlFor="subjects" className="block text-sm font-medium text-gray-700 dark:text-gray-300">Subjects (comma-separated):</label>
+                  <input
+                    type="text"
+                    id="subjects"
+                    placeholder="e.g., Math, Physics, Chemistry"
+                    value={formData.subjects.join(', ')}
+                    onChange={(e) => setFormData({ ...formData, subjects: e.target.value.split(',') })}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  />
+                </div>
                 <input
                   type="number"
                   placeholder="Hours per day"
@@ -189,10 +267,31 @@ export default function Planner() {
                   required
                   className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 />
+                <button
+                  type="button"
+                  onClick={generateTimetable}
+                  className="w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
+                  disabled={generatingAiPlan} // Disable button while loading
+                >
+                  {generatingAiPlan ? 'Generating...' : 'Generate Timetable'} // Change text while loading
+                </button>
+                {generatedSchedule.length > 0 && (
+                  <div className="mt-4 p-4 bg-gray-100 dark:bg-gray-700 rounded-lg">
+                    <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Generated Timetable:</h3>
+                    <div className="max-h-40 overflow-y-auto space-y-1">
+                      {generatedSchedule.map((day, idx) => (
+                        <p key={idx} className="text-sm text-gray-700 dark:text-gray-300">
+                          <span className="font-medium">{day.date}:</span> {day.subjects.join(', ')} ({day.hours} hrs)
+                        </p>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div className="flex gap-4">
                   <button
                     type="submit"
                     className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                    disabled={generatingAiPlan} // Disable button while loading
                   >
                     {editingPlan ? 'Update' : 'Create Plan'}
                   </button>
@@ -201,6 +300,7 @@ export default function Planner() {
                     onClick={() => {
                       setShowModal(false);
                       setEditingPlan(null);
+                      setGeneratedSchedule([]); // Clear generated schedule on cancel
                     }}
                     className="px-4 py-2 bg-gray-200 dark:bg-gray-700 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
                   >

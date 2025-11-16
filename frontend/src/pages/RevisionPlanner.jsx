@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext'; // Removed old AuthContext import
 import api from '../utils/api';
 import { toast } from 'react-hot-toast';
 import { format, addDays, differenceInDays } from 'date-fns';
@@ -7,7 +7,7 @@ import { FiCalendar, FiPlus, FiTrash2, FiSave } from 'react-icons/fi';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 export default function RevisionPlanner() {
-  const { user } = useAuth();
+  // const { user } = useAuth(); // User is not directly used in this component after Clerk integration
   const [subjects, setSubjects] = useState([{ name: '', hours: '' }]);
   const [examDate, setExamDate] = useState('');
   const [hoursPerDay, setHoursPerDay] = useState(4);

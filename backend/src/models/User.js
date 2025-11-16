@@ -42,6 +42,98 @@ const userSchema = new mongoose.Schema({
     minlength: [6, "Password must be at least 6 characters"],
     select: false,
   },
+  role: {
+    type: String,
+    enum: ["user", "admin"],
+    default: "user",
+  },
+  isSeniorProfileActive: {
+    type: Boolean,
+    default: false,
+  },
+  seniorSubjects: [
+    {
+      subject: { type: String, trim: true },
+      marks: { type: String, trim: true },
+    },
+  ],
+  seniorDescription: {
+    type: String,
+    trim: true,
+  },
+  profilePictureUrl: {
+    type: String,
+  },
+  connectionLink: {
+    type: String,
+  },
+  averageRating: {
+    type: Number,
+    default: 0,
+    min: 0,
+    max: 5,
+  },
+  rollNumber: {
+    type: String,
+    trim: true,
+  },
+  dateOfBirth: {
+    type: Date,
+  },
+  gender: {
+    type: String,
+    enum: ['Male', 'Female', 'Other'],
+  },
+  address: {
+    type: String,
+    trim: true,
+  },
+  phoneNumber: {
+    type: String,
+    trim: true,
+  },
+  tenthMarks: {
+    type: String,
+    trim: true,
+  },
+  twelfthMarks: {
+    type: String,
+    trim: true,
+  },
+  course: {
+    type: String,
+    trim: true,
+  },
+  university: {
+    type: String,
+    trim: true,
+  },
+  linkedinProfile: {
+    type: String,
+    trim: true,
+  },
+  githubProfile: {
+    type: String,
+    trim: true,
+  },
+  portfolioWebsite: {
+    type: String,
+    trim: true,
+  },
+  sessionsTaken: {
+    type: Number,
+    default: 0,
+  },
+  sessionsAttended: {
+    type: Number,
+    default: 0,
+  },
+  reviews: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Review',
+    },
+  ],
   files: [fileSchema],
   createdAt: {
     type: Date,

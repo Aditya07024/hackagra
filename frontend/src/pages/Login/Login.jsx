@@ -1,12 +1,13 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../../contexts/AuthContext';
-import toast from 'react-hot-toast';
-import Loading from '../../components/Loading/Loading';
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/AuthContext";
+import toast from "react-hot-toast";
+import { FiMail, FiLock, FiLogIn, FiUser } from "react-icons/fi";
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [role, setRole] = useState("student");
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -14,147 +15,131 @@ export default function Login() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    try {
-      await login(email, password);
-      toast.success('Login successful!');
-      navigate('/dashboard');
-    } catch (error) {
-      toast.error(error.response?.data?.message || 'Login failed');
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const handleDemoLogin = async () => {
-    setLoading(true);
-    setEmail('demo@hackagra.com');
-    setPassword('demo123');
-    try {
-      await login('demo@hackagra.com', 'demo123');
-      toast.success('Demo login successful!');
-      navigate('/dashboard');
-    } catch (error) {
-      // If demo login fails, use mock credentials for demo purposes
-      toast.success('Using demo credentials to access dashboard...');
-      // For demo purposes, create a mock user session
-      const mockUser = {
-        _id: 'demo-user-id',
-        name: 'Demo User',
-        email: 'demo@hackagra.com',
-        college: 'Demo College',
-        photo: null,
-      };
-      const mockToken = 'demo-token-' + Date.now();
-      localStorage.setItem('token', mockToken);
-      localStorage.setItem('user', JSON.stringify(mockUser));
-      
-      // Reload to update auth context
-      setTimeout(() => {
-        window.location.href = '/dashboard';
-      }, 300);
-    } finally {
-      setLoading(false);
+    const result = await login(email, password, role);
+
+    if (result.success) {
+      toast.success("Login successful!");
+      navigate("/dashboard");
+    } else {
+      toast.error(result.message || "Login failed");
     }
+
+    setLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900 dark:text-white">
-            Sign in to HackAgra
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Or{' '}
-            <Link to="/signup" className="font-medium text-blue-600 hover:text-blue-500">
-              create a new account
-            </Link>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 px-4">
+      <div className="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+            Welcome Back
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Sign in to your account
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="rounded-md shadow-sm -space-y-px">
-            <div>
-              <label htmlFor="email" className="sr-only">
-                Email address
-              </label>
+
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Email
+            </label>
+            <div className="relative">
+              <FiMail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 id="email"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                required
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your email"
               />
             </div>
-            <div>
-              <label htmlFor="password" className="sr-only">
-                Password
-              </label>
+          </div>
+
+          <div>
+            <label
+              htmlFor="role"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Role
+            </label>
+            <div className="relative">
+              <FiUser className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+              <select
+                id="role"
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                required
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent appearance-none"
+              >
+                <option value="student">Student</option>
+                <option value="teacher">Teacher</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2"
+            >
+              Password
+            </label>
+            <div className="relative">
+              <FiLock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
               <input
                 id="password"
-                name="password"
                 type="password"
-                autoComplete="current-password"
-                required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-gray-800 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                required
+                className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                placeholder="Enter your password"
               />
             </div>
           </div>
 
           <div className="flex items-center justify-between">
-            <div className="text-sm">
-              <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
-                Forgot your password?
-              </Link>
-            </div>
+            <Link
+              to="/forgot-password"
+              className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+            >
+              Forgot password?
+            </Link>
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              {loading ? <Loading size="sm" /> : 'Sign in'}
-            </button>
-          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? (
+              "Signing in..."
+            ) : (
+              <>
+                <FiLogIn className="w-5 h-5" />
+                Sign In
+              </>
+            )}
+          </button>
         </form>
 
-        {/* Demo Credentials Section */}
-        <div className="mt-6">
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300 dark:border-gray-600"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400">
-                Or try demo account
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-4">
-            <button
-              type="button"
-              onClick={handleDemoLogin}
-              disabled={loading}
-              className="w-full flex justify-center items-center gap-2 py-2.5 px-4 border-2 border-dashed border-dashboard-red text-sm font-medium rounded-md text-dashboard-red bg-red-50 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-dashboard-red disabled:opacity-50 transition-colors"
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            Don't have an account?{" "}
+            <Link
+              to="/signup"
+              className="text-blue-600 hover:text-blue-500 dark:text-blue-400 font-medium"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-              {loading ? 'Logging in...' : 'Login with Demo Credentials'}
-            </button>
-            <p className="mt-2 text-xs text-center text-gray-500 dark:text-gray-400">
-              Email: demo@hackagra.com | Password: demo123
-            </p>
-          </div>
+              Sign up
+            </Link>
+          </p>
         </div>
       </div>
     </div>

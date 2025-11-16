@@ -51,17 +51,32 @@ export default function Landing() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              to="/signup"
+              to="/login"
               className="px-8 py-4 bg-blue-600 text-white rounded-lg font-semibold text-lg hover:bg-blue-700 transition shadow-lg hover:shadow-xl"
             >
               Get Started
             </Link>
-            <Link
-              to="/login"
-              className="px-8 py-4 border-2 border-blue-600 text-blue-600 dark:text-blue-400 rounded-lg font-semibold text-lg hover:bg-blue-50 dark:hover:bg-gray-800 transition"
-            >
-              Login
-            </Link>
+          </div>
+
+          <div className="text-center mt-8">
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-blue-600 hover:text-blue-500 font-medium transition"
+              >
+                Log in
+              </Link>
+            </p>
+            <p className="text-gray-600 dark:text-gray-400 text-lg mt-2">
+              New user?{" "}
+              <Link
+                to="/signup"
+                className="inline-block px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold text-lg hover:bg-gray-100 transition"
+              >
+                Create Account
+              </Link>
+            </p>
           </div>
         </motion.div>
       </section>
@@ -112,7 +127,7 @@ export default function Landing() {
             Join thousands of students using MindVerse to make campus life easier.
           </p>
           <Link
-            to="/signup"
+            to="/sign-up"
             className="inline-block px-8 py-4 bg-white text-blue-600 rounded-lg font-semibold text-lg hover:bg-gray-100 transition"
           >
             Create Account

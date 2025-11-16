@@ -86,6 +86,15 @@ const User = sequelize.define(
         len: [6, 255],
       },
     },
+
+    role: {
+      type: DataTypes.ENUM('student', 'teacher'),
+      allowNull: false,
+      defaultValue: 'student',
+      validate: {
+        isIn: [['student', 'teacher']],
+      },
+    },
   },
   {
     timestamps: true,

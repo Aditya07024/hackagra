@@ -4,21 +4,26 @@
 
 /* Add a nice font globally and smooth transitions */
 body {
-  @apply bg-dashboard-bg text-gray-900 font-sans transition-colors duration-300;
+  @apply text-gray-900 font-sans transition-colors duration-300;
   font-family: "Inter", "Roboto", "sans-serif";
   width: 100%;
   overflow-x: hidden;
   background-image: radial-gradient(
       circle at 20% 50%,
-      rgba(254, 243, 199, 0.3) 0%,
+      rgba(255, 255, 255, 0.3) 0%,
       transparent 50%
     ),
     radial-gradient(
       circle at 80% 80%,
-      rgba(254, 243, 199, 0.2) 0%,
+      rgba(255, 255, 255, 0.2) 0%,
       transparent 50%
     );
   background-attachment: fixed;
+}
+
+.dark body {
+  color: #F5F5DC;
+  background-image: linear-gradient(135deg, #0A1930 0%, #152A4A 100%);
 }
 
 /* Wavy pattern overlay */
@@ -33,11 +38,21 @@ body::before {
     45deg,
     transparent,
     transparent 10px,
-    rgba(254, 243, 199, 0.1) 10px,
-    rgba(254, 243, 199, 0.1) 20px
+    rgba(255, 255, 255, 0.1) 10px,
+    rgba(255, 255, 255, 0.1) 20px
   );
   pointer-events: none;
   z-index: 0;
+}
+
+.dark body::before {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(25, 40, 70, 0.1) 10px,
+    rgba(25, 40, 70, 0.1) 20px
+  );
 }
 
 /* Optionally, customize scrollbars or selection */

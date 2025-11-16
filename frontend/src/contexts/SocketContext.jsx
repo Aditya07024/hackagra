@@ -14,15 +14,15 @@ export const useSocket = () => {
 
 export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated, token, user } = useAuth();
 
   useEffect(() => {
-    if (isAuthenticated && user) {
+    if (isAuthenticated && token && user) {
       const socketUrl =
         import.meta.env.VITE_SOCKET_URL || "http://localhost:5001";
       const newSocket = io(socketUrl, {
         auth: {
-          token: localStorage.getItem("token"),
+          token: token,
         },
       });
 
@@ -45,7 +45,7 @@ export const SocketProvider = ({ children }) => {
         setSocket(null);
       }
     }
-  }, [isAuthenticated, user]);
+  }, [isAuthenticated, token, user]);
 
   return (
     <SocketContext.Provider value={{ socket }}>

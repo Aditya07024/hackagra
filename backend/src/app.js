@@ -15,6 +15,8 @@ const app = express();
 // Routes
 const fileRoutes = require("./routes/fileRoutes");
 const userRoutes = require("./routes/userRoutes");
+const authRoutes = require("./routes/authRoutes");
+const reviewRoutes = require("./routes/reviewRoutes"); // New: Review routes
 
 // Middleware
 app.use(
@@ -37,8 +39,10 @@ app.get("/api/ping", (req, res) => {
 });
 
 // Mount routes
+app.use("/api/auth", authRoutes);
 app.use("/api", fileRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/reviews", reviewRoutes); // New: Mount review routes
 
 // 404 handler
 app.use((req, res) => {

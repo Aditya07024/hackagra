@@ -17,7 +17,7 @@ import MindMap from './MindMap';
 import { uploadToCloudinary } from "../utils/cloudinaryUpload";
 
 export default function SmartSummarizer() {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [summarizing, setSummarizing] = useState(false);
@@ -27,8 +27,10 @@ export default function SmartSummarizer() {
   const [showMindMap, setShowMindMap] = useState(false);
 
   useEffect(() => {
-    fetchHistory();
-  }, []);
+    if (!authLoading && user) {
+      fetchHistory();
+    }
+  }, [authLoading, user]);
 
   const fetchHistory = async () => {
     try {

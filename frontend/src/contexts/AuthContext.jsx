@@ -1,12 +1,12 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-import api from '../utils/api';
+import { createContext, useContext, useState, useEffect } from "react";
+import api from "../utils/api";
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -14,91 +14,98 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState(localStorage.getItem("token"));
 
+  // Check if user is authenticated on mount
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const savedUser = localStorage.getItem('user');
-    if (token && savedUser) {
-      try {
-        const user = JSON.parse(savedUser);
-        setUser(user);
-        
-        // Skip API verification for demo users
-        if (token.startsWith('demo-token-')) {
-          setLoading(false);
-          return;
+    const checkAuth = async () => {
+      const storedToken = localStorage.getItem("token");
+      if (storedToken) {
+        try {
+          const response = await api.get("/auth/me");
+          if (response.data.success) {
+            setUser(response.data.data);
+            setToken(storedToken);
+          } else {
+            localStorage.removeItem("token");
+            setToken(null);
+          }
+        } catch (error) {
+          console.error("Auth check failed:", error);
+          localStorage.removeItem("token");
+          setToken(null);
         }
-        
-        // Verify token is still valid for real users
-        api.get('/auth/me')
-          .then((res) => {
-            if (res.data && res.data.user) {
-              setUser(res.data.user);
-              localStorage.setItem('user', JSON.stringify(res.data.user));
-            }
-          })
-          .catch((error) => {
-            console.error('Auth verification failed:', error);
-            // Don't clear demo users on API failure
-            if (!token.startsWith('demo-token-')) {
-              localStorage.removeItem('token');
-              localStorage.removeItem('user');
-              setUser(null);
-            }
-          })
-          .finally(() => setLoading(false));
-      } catch (error) {
-        console.error('Error parsing saved user:', error);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
-        setUser(null);
-        setLoading(false);
       }
-    } else {
       setLoading(false);
-    }
+    };
+
+    checkAuth();
   }, []);
 
-  const login = async (email, password) => {
-    const res = await api.post('/auth/login', { email, password });
-    const { token, user } = res.data;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
-    return res.data;
+  const login = async (email, password, role) => {
+    try {
+      const response = await api.post("/auth/login", { email, password, role });
+      if (response.data.success) {
+        const { token, user } = response.data.data;
+        localStorage.setItem("token", token);
+        setToken(token);
+        setUser(user);
+        return { success: true, user };
+      }
+      return { success: false, message: response.data.message };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Login failed",
+      };
+    }
   };
 
-  const signup = async (name, email, password, college) => {
-    const res = await api.post('/auth/signup', { name, email, password, college });
-    const { token, user } = res.data;
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
-    return res.data;
+  const register = async (username, email, password, role = "student") => {
+    try {
+      const response = await api.post("/auth/register", {
+        username,
+        email,
+        password,
+        role,
+      });
+      if (response.data.success) {
+        const { token, user } = response.data.data;
+        localStorage.setItem("token", token);
+        setToken(token);
+        setUser(user);
+        return { success: true, user };
+      }
+      return { success: false, message: response.data.message };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || "Registration failed",
+      };
+    }
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.removeItem("token");
+    setToken(null);
     setUser(null);
   };
 
-  const updateProfile = async (data) => {
-    const res = await api.put('/auth/profile', data);
-    setUser(res.data.user);
-    localStorage.setItem('user', JSON.stringify(res.data.user));
-    return res.data;
+  const updateUser = (userData) => {
+    setUser((prev) => ({ ...prev, ...userData }));
   };
 
   const value = {
     user,
+    token,
     loading,
+    isAuthenticated: !!token && !!user,
     login,
-    signup,
+    register,
     logout,
-    updateProfile,
-    isAuthenticated: !!user,
+    updateUser,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+

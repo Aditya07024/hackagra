@@ -3,16 +3,15 @@ import { useAuth } from '../../contexts/AuthContext';
 import Loading from '../Loading/Loading';
 
 export default function ProtectedRoute({ children }) {
-  const { user, loading } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
     return <Loading />;
   }
 
-  if (!user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
   return children;
 }
-

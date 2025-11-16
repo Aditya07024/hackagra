@@ -3,7 +3,7 @@ require("dotenv").config();
 
 // PostgreSQL connection using Sequelize
 const databaseUrl = process.env.DATABASE_URL;
-const useLocalDb = process.env.USE_LOCAL_DB === "true";
+const useLocalDb = true;
 
 if (!databaseUrl && !useLocalDb) {
   console.error("✗ DATABASE_URL environment variable is not set!");
